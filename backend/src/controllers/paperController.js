@@ -128,8 +128,9 @@ export const uploadPaper = async (req, res, next) => {
     console.log(`[UploadPaper] File received: ${req.file.originalname} (${req.file.size} bytes)`);
 
     // 1. Upload file buffer to Cloudinary
-    // Note: Cloudinary expects PDFs under the 'image' resource type to deliver them with application/pdf headers
-    const uploadResult = await uploadToCloudinary(req.file.buffer, 'pyq_papers', 'image');
+    const isPdf = req.file.mimetype === 'application/pdf';
+    const resourceType = isPdf ? 'raw' : 'image';
+    const uploadResult = await uploadToCloudinary(req.file.buffer, 'pyq_papers', resourceType);
     console.log(`[UploadPaper] Cloudinary upload successful: ${uploadResult.secure_url}`);
 
     // 2. Perform OCR and Text Extraction asynchronously (or inline with progress)
@@ -201,8 +202,10 @@ export const deletePaper = async (req, res, next) => {
 
     // 1. Delete asset from Cloudinary
     try {
-      // Both PDFs and photos are now stored as 'image' resources in Cloudinary
-      await deleteFromCloudinary(paper.pdfPublicId, 'image');
+      // Determine correct resource type. Cloudinary raw for pdf, image for image.
+      const isPdf = paper.pdfUrl.toLowerCase().endsWith('.pdf');
+      const resourceType = isPdf ? 'raw' : 'image';
+      await deleteFromCloudinary(paper.pdfPublicId, resourceType);
     } catch (cloudErr) {
       console.error(`[DeletePaper] Cloudinary asset deletion failed: ${cloudErr.message}`);
     }
