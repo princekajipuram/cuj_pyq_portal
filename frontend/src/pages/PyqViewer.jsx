@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { ViewerSkeleton } from '../components/common/Skeleton.jsx';
@@ -13,12 +13,34 @@ import {
   Copy,
   Check,
   Flag,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 
 export const PyqViewer = () => {
   const { paperId } = useParams();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleDeletePaperDirect = async () => {
+    if (!window.confirm('Are you absolutely sure you want to delete this question paper and all its extracted OCR questions? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/papers/${paperId}`);
+      alert('Question paper deleted successfully.');
+      // Redirect back to subject details page or catalog
+      if (paper?.subject) {
+        navigate(`/subject-details/${paper.subject._id}?name=${encodeURIComponent(paper.subject.name)}&code=${encodeURIComponent(paper.subject.code)}`);
+      } else {
+        navigate('/departments');
+      }
+    } catch (err) {
+      console.error('Delete paper error', err);
+      alert('Failed to delete paper');
+    }
+  };
 
   const [paper, setPaper] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -29,7 +51,6 @@ export const PyqViewer = () => {
   const [activeRightTab, setActiveRightTab] = useState('structured'); // 'structured' or 'raw'
   const [copiedId, setCopiedId] = useState(null);
   const [copiedRaw, setCopiedRaw] = useState(false);
-  const [useGoogleViewer, setUseGoogleViewer] = useState(false);
 
   // Report Modal state
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -151,9 +172,6 @@ export const PyqViewer = () => {
   };
 
   const embedUrl = paper.pdfUrl;
-  const iframeSrc = useGoogleViewer
-    ? `https://docs.google.com/gview?url=${encodeURIComponent(embedUrl)}&embedded=true`
-    : `${embedUrl}#view=FitH`;
 
   return (
     <div className="space-y-6 py-4 px-2 sm:px-4 max-w-[1600px] mx-auto">
@@ -208,6 +226,17 @@ export const PyqViewer = () => {
             <Download className="w-4 h-4" />
             <span>Download PDF</span>
           </a>
+
+          {user?.role === 'admin' && (
+            <button
+              onClick={handleDeletePaperDirect}
+              className="h-11 px-4 bg-rose-600 hover:bg-rose-505 text-white rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all hover:scale-[1.01] active:scale-95 cursor-pointer shadow-md shadow-rose-600/10"
+              title="Delete Paper"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Paper</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -215,23 +244,17 @@ export const PyqViewer = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[calc(100vh-180px)]">
         {/* Left Side Panel: PDF Embedded iframe */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-850 p-2 overflow-hidden shadow-sm flex flex-col">
-          <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center gap-2">
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
               <FileText className="w-3.5 h-3.5" />
               <span>Full Paper View</span>
             </span>
-            <button
-              onClick={() => setUseGoogleViewer(prev => !prev)}
-              className="px-2.5 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-850/60 text-slate-500 hover:text-indigo-600 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
-              title="Click here to switch viewing modes if the PDF fails to load."
-            >
-              Mode: {useGoogleViewer ? 'Google Web' : 'Native Browser'}
-            </button>
+            <span className="text-[10px] text-slate-400">PDF Reader mode</span>
           </div>
           <div className="flex-1 min-h-[500px] lg:min-h-0 relative bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden mt-2">
             {isValidPdf(embedUrl) ? (
               <iframe
-                src={iframeSrc}
+                src={`${embedUrl}#view=FitH`}
                 title={`${paper.subject?.name} PDF`}
                 className="w-full h-full border-none min-h-[550px] lg:h-full rounded-2xl bg-white"
               />
