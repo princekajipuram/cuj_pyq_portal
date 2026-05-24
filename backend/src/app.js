@@ -32,30 +32,23 @@ connectDB();
 const app = express();
 app.set('trust proxy', 1); // Trust Render's reverse proxy for rate-limiting
 
-// Security Middlewares
-app.use(helmet());
-
-// CORS Configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
+// 1. CORS Configuration (MUST BE FIRST)
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('CORS blocked'), false);
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://project-wx9j1.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-// Body Parser
+// 2. Security Headers (MUST BE SECOND)
+app.use(helmet());
+
+// 3. Body Parser (MUST BE THIRD)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
