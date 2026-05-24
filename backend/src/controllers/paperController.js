@@ -130,7 +130,7 @@ export const uploadPaper = async (req, res, next) => {
     // 1. Upload file buffer to Cloudinary
     const isPdf = req.file.mimetype === 'application/pdf' || req.file.originalname.toLowerCase().endsWith('.pdf');
     const resourceType = isPdf ? 'raw' : 'image';
-    const uploadResult = await uploadToCloudinary(req.file.buffer, 'pyq_papers', resourceType);
+    const uploadResult = await uploadToCloudinary(req.file.buffer, 'pyq_papers', resourceType, req.file.originalname);
     console.log(`[UploadPaper] Cloudinary upload successful: ${uploadResult.secure_url}`);
 
     // 2. Perform OCR and Text Extraction asynchronously (or inline with progress)
