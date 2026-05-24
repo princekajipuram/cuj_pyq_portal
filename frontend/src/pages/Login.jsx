@@ -113,27 +113,6 @@ export const Login = () => {
               )}
             </button>
           </form>
-
-          {/* Quick Mock Login helpers */}
-          <div className="border-t border-slate-100 dark:border-slate-900 pt-4 space-y-2">
-            <p className="text-xs text-slate-400 dark:text-slate-500 text-center font-medium">Quick Sandbox Logins:</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => { setEmail('student@cuj.edu'); setPassword('student123'); }}
-                className="py-1.5 px-3 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-              >
-                Mock Student
-              </button>
-              <button
-                type="button"
-                onClick={() => { setEmail('admin@cuj.edu'); setPassword('admin123'); }}
-                className="py-1.5 px-3 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-              >
-                Mock Admin
-              </button>
-            </div>
-          </div>
         </div>
 
         <p className="text-sm text-center text-slate-500 dark:text-slate-400">
