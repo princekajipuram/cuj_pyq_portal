@@ -11,9 +11,9 @@ export const Footer = () => {
             <span>Central University of Jammu PYQs</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
-            <span>Prepared by Antigravity AI</span>
+            <span>Official PYQ Repository</span>
             <span className="hidden sm:inline">|</span>
-            <span>Resume Grade Application</span>
+            <span>Student & Faculty Portal</span>
           </div>
         </div>
         <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-900 text-center text-xs text-slate-400 dark:text-slate-600">
