@@ -144,8 +144,11 @@ export const PyqViewer = () => {
     );
   }
 
-  // Ensure Cloudinary URLs display cleanly inline
-  // If the pdfUrl is a secure HTTPS link, we can embed it inside an iframe
+  // Safety filter for verifying PDF URL validity
+  const isValidPdf = (url) => {
+    return typeof url === 'string' && url.includes('http');
+  };
+
   const embedUrl = paper.pdfUrl;
 
   return (
@@ -216,11 +219,21 @@ export const PyqViewer = () => {
             <span className="text-[10px] text-slate-400">PDF Reader mode</span>
           </div>
           <div className="flex-1 min-h-[500px] lg:min-h-0 relative bg-slate-100 dark:bg-slate-950 rounded-2xl overflow-hidden mt-2">
-            <iframe
-              src={`${embedUrl}#view=FitH`}
-              title={`${paper.subject?.name} PDF`}
-              className="w-full h-full border-none min-h-[550px] lg:h-full rounded-2xl bg-white"
-            />
+            {isValidPdf(embedUrl) ? (
+              <iframe
+                src={`${embedUrl}#view=FitH`}
+                title={`${paper.subject?.name} PDF`}
+                className="w-full h-full border-none min-h-[550px] lg:h-full rounded-2xl bg-white"
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-2xl">
+                <AlertTriangle className="w-12 h-12 text-rose-500 mb-3 animate-bounce" />
+                <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">Invalid PDF Link</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs">
+                  This question paper's file storage URL is unsupported, corrupt, or could not be loaded.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
