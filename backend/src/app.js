@@ -37,25 +37,23 @@ app.use(helmet());
 
 // CORS Configuration
 const allowedOrigins = [
-  'http://localhost:5173', // Vite local development
+  'http://localhost:5173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL  // Production deploy url (Vercel)
+  process.env.FRONTEND_URL
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
-    },
-    credentials: true
-  })
-);
+    }
+
+    return callback(new Error('CORS blocked'), false);
+  },
+  credentials: true
+}));
 
 // Body Parser
 app.use(express.json());
