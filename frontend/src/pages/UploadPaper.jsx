@@ -152,15 +152,17 @@ export const UploadPaper = () => {
         }
       });
 
-      if (res.data.success) {
-        setSuccessData(res.data.data);
+      if (res?.data?.success) {
+        setSuccessData(res.data.data || {});
         // Clear file
         setFile(null);
         setSelectedSub('');
+      } else {
+        setErrorMsg(res?.data?.message || 'Server processed the upload but returned an unexpected response.');
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.response?.data?.message || 'File upload failed. Ensure server is online.');
+      setErrorMsg(err?.response?.data?.message || err?.message || 'File upload failed. Ensure server is online.');
     } finally {
       setUploading(false);
     }
@@ -188,15 +190,17 @@ export const UploadPaper = () => {
             <h4 className="text-base font-extrabold text-emerald-800 dark:text-emerald-400">Upload Processed Successfully!</h4>
             <p className="text-sm text-emerald-700 dark:text-emerald-350">
               The PDF has been stored in Cloudinary and registered. 
-              Our OCR successfully parsed **{successData.questionsCount}** individual questions automatically!
+              Our OCR successfully parsed **{successData?.questionsCount || 0}** individual questions automatically!
             </p>
             <div className="pt-2 flex gap-3">
-              <Link
-                to={`/viewer/${successData.paper?._id}`}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all"
-              >
-                Open in Viewer
-              </Link>
+              {successData?.paper?._id && (
+                <Link
+                  to={`/viewer/${successData.paper._id}`}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all"
+                >
+                  Open in Viewer
+                </Link>
+              )}
               <button
                 onClick={() => setSuccessData(null)}
                 className="px-4 py-2 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-100/30"
