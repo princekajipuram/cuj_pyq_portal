@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
 
