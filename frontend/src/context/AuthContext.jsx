@@ -48,9 +48,11 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
     } catch (error) {
+      const serverMsg = error.response?.data?.message;
+      const validationMsg = error.response?.data?.errors?.[0]?.message;
       return {
         success: false,
-        message: error.response?.data?.message || 'Registration failed'
+        message: serverMsg || validationMsg || 'Registration failed'
       };
     }
   };
@@ -70,9 +72,11 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
     } catch (error) {
+      const serverMsg = error.response?.data?.message;
+      const validationMsg = error.response?.data?.errors?.[0]?.message;
       return {
         success: false,
-        message: error.response?.data?.message || 'Invalid credentials'
+        message: serverMsg || validationMsg || 'Invalid credentials'
       };
     }
   };

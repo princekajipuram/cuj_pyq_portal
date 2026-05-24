@@ -30,6 +30,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Trust Render's reverse proxy for rate-limiting
 
 // Security Middlewares
 app.use(helmet());
