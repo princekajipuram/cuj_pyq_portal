@@ -76,7 +76,7 @@ export const Login = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@cuj.edu"
+                  placeholder="Enter your email"
                   className="w-full bg-transparent pl-3 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-450 focus:outline-none"
                   required
                 />

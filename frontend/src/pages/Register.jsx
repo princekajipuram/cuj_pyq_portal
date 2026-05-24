@@ -85,7 +85,7 @@ export const Register = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Rahul Kumar"
+                  placeholder="Enter your full name"
                   className="w-full bg-transparent pl-3 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-450 focus:outline-none"
                   required
                 />
@@ -94,13 +94,13 @@ export const Register = () => {
 
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
-              <div className="relative flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-3 group focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
+              <div className="relative flex items-center bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-900 rounded-xl px-3 group focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
                 <Mail className="w-4 h-4 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@cuj.edu"
+                  placeholder="Enter your CUJ email"
                   className="w-full bg-transparent pl-3 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-450 focus:outline-none"
                   required
                 />
