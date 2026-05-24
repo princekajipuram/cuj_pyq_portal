@@ -31,8 +31,9 @@ const cleanData = async () => {
 
     for (const paper of allPapers) {
       const url = paper.pdfUrl || '';
-      // Check if it is a broken image/upload PDF
-      const isBad = url.includes('image/upload') && url.toLowerCase().endsWith('.pdf');
+      // Check if it is a broken image/upload PDF, OR if it's a Cloudinary raw upload missing the .pdf extension
+      const isBad = (url.includes('image/upload') && url.toLowerCase().endsWith('.pdf')) || 
+                    (url.includes('cloudinary.com') && !url.toLowerCase().endsWith('.pdf'));
       
       if (isBad) {
         badPapers.push(paper);
