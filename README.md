@@ -33,6 +33,7 @@ This project tackles the difficult problem of unstructured, scattered academic r
 ## ⚠️ Known Limitations
 
 *   **OCR Accuracy Dependency**: Text extraction relies on Tesseract.js. The accuracy of the parsed text heavily depends on the scan quality, contrast, and handwriting legibility of the uploaded document. Heavily distorted or extremely low-resolution scans may result in partial text extraction.
+*   **Sample Dataset**: This deployment serves as a functional proof-of-concept. The current database is seeded with a curated subset of departments, subjects, and semesters to demonstrate the system's capabilities, rather than an exhaustive catalog of all university courses.
 
 ---
 
