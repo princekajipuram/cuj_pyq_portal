@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext.jsx';
 
 export const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, isAdmin } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) {
@@ -22,7 +22,7 @@ export const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (adminOnly && user.role !== 'admin') {
+  if (adminOnly && !isAdmin) {
     // Authorized user but not an admin, redirect to home page
     return <Navigate to="/" replace />;
   }

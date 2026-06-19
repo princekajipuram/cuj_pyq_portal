@@ -1,9 +1,9 @@
 import QuestionPaper from '../models/QuestionPaper.js';
 import Subject from '../models/Subject.js';
 import Question from '../models/Question.js';
+import SavedPaper from '../models/SavedPaper.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../services/cloudinaryService.js';
-import { extractTextFromFile } from '../services/ocrService.js';
-import { extractAndStoreQuestions } from '../services/questionParser.js';
+import { ocrEvents } from '../workers/ocrWorker.js';
 
 /**
  * @desc    Get all question papers with search and filters
@@ -133,15 +133,7 @@ export const uploadPaper = async (req, res, next) => {
     const uploadResult = await uploadToCloudinary(req.file.buffer, 'pyq_papers', resourceType, req.file.originalname);
     console.log(`[UploadPaper] Cloudinary upload successful: ${uploadResult.secure_url}`);
 
-    // 2. Perform OCR and Text Extraction asynchronously (or inline with progress)
-    let extractedText = '';
-    try {
-      extractedText = await extractTextFromFile(req.file.buffer, req.file.mimetype);
-    } catch (ocrErr) {
-      console.error(`[UploadPaper] OCR extraction failed non-blocking: ${ocrErr.message}`);
-    }
-
-    // 3. Create the QuestionPaper document
+    // 2. Create the QuestionPaper document as PENDING
     const paper = await QuestionPaper.create({
       subject: subjectId,
       year: parseInt(year, 10),
@@ -149,32 +141,27 @@ export const uploadPaper = async (req, res, next) => {
       pdfUrl: uploadResult.secure_url,
       pdfPublicId: uploadResult.public_id,
       uploadedBy: req.user._id,
-      isVerified: req.user.role === 'admin', // Auto-verify if uploaded by admin
-      extractedText: extractedText
+      isVerified: req.user.role === 'admin',
+      ocrStatus: 'PENDING'
     });
 
-    // 4. Heuristically parse questions and insert them into database
-    let parsedQuestions = [];
-    if (extractedText) {
-      try {
-        parsedQuestions = await extractAndStoreQuestions(
-          extractedText,
-          subjectId,
-          subject.semester._id,
-          parseInt(year, 10),
-          paper._id
-        );
-      } catch (parseErr) {
-        console.error(`[UploadPaper] Question heuristic parser failed: ${parseErr.message}`);
-      }
-    }
+    // 3. Dispatch Async OCR Job (Does not block Event Loop)
+    ocrEvents.emit('process-paper', {
+      paperId: paper._id,
+      fileBuffer: req.file.buffer,
+      mimeType: req.file.mimetype,
+      subjectId,
+      semesterId: subject.semester._id,
+      year: parseInt(year, 10)
+    });
 
-    res.status(201).json({
+    // 4. Respond instantly
+    res.status(202).json({
       success: true,
-      message: 'Question paper uploaded and processed successfully',
+      message: 'Question paper uploaded successfully. OCR processing started in background.',
       data: {
         paper,
-        questionsCount: parsedQuestions.length
+        jobStatus: 'PENDING'
       }
     });
   } catch (error) {
@@ -213,7 +200,10 @@ export const deletePaper = async (req, res, next) => {
     // 2. Remove associated extracted questions
     await Question.deleteMany({ paper: paper._id });
 
-    // 3. Remove paper document
+    // 3. Remove any saved bookmarks for this paper
+    await SavedPaper.deleteMany({ paper: paper._id });
+
+    // 4. Remove paper document
     await paper.deleteOne();
 
     res.status(200).json({

@@ -42,7 +42,7 @@ export const Navbar = () => {
                 <span>Bookmarks</span>
               </Link>
             )}
-            {user && (
+            {isAdmin && (
               <Link to="/upload" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors">
                 Upload Paper
               </Link>
@@ -150,7 +150,7 @@ export const Navbar = () => {
               Bookmarks
             </Link>
           )}
-          {user && (
+          {isAdmin && (
             <Link
               to="/upload"
               onClick={() => setMobileOpen(false)}

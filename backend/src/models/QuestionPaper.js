@@ -37,6 +37,15 @@ const questionPaperSchema = new mongoose.Schema(
     extractedText: {
       type: String,
       default: ''
+    },
+    ocrStatus: {
+      type: String,
+      enum: ['PENDING', 'PROCESSING', 'SUCCESS', 'FAILED'],
+      default: 'PENDING'
+    },
+    ocrError: {
+      type: String,
+      default: null
     }
   },
   {

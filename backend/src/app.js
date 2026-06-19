@@ -48,9 +48,12 @@ app.use(cors({
 // 2. Security Headers (MUST BE SECOND)
 app.use(helmet());
 
+import cookieParser from 'cookie-parser';
+
 // 3. Body Parser (MUST BE THIRD)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Global Rate Limiter
 const globalLimiter = rateLimit({

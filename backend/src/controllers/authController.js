@@ -26,9 +26,8 @@ export const signup = async (req, res, next) => {
       });
     }
 
-    // Determine role (default is user, admin registration requires pre-existence check or strict setting)
-    // For educational/portability reasons, first user could optionally be admin or we respect requested role
-    const finalRole = role && ['admin', 'user'].includes(role) ? role : 'user';
+    // Strict Role Enforcement: Only admin@cuj.edu gets the admin role.
+    const finalRole = email.toLowerCase() === 'admin@cuj.edu' ? 'admin' : 'user';
 
     // Create user
     const user = await User.create({
@@ -39,6 +38,15 @@ export const signup = async (req, res, next) => {
     });
 
     if (user) {
+      const token = generateToken(user._id);
+      
+      res.cookie('token', token, {
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict'
+      });
+
       res.status(201).json({
         success: true,
         _id: user._id,
@@ -85,13 +93,21 @@ export const login = async (req, res, next) => {
       });
     }
 
+    const token = generateToken(user._id);
+    
+    res.cookie('token', token, {
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict'
+    });
+
     res.status(200).json({
       success: true,
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      token: generateToken(user._id)
+      role: user.role
     });
   } catch (error) {
     next(error);

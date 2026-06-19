@@ -22,12 +22,12 @@ export const PyqViewer = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleDeletePaperDirect = async () => {
-    if (!window.confirm('Are you absolutely sure you want to delete this question paper and all its extracted OCR questions? This action cannot be undone.')) {
-      return;
-    }
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
+  const confirmDelete = async () => {
     try {
+      setDeleteSubmitting(true);
       await api.delete(`/papers/${paperId}`);
       alert('Question paper deleted successfully.');
       // Redirect back to subject details page or catalog
@@ -39,6 +39,9 @@ export const PyqViewer = () => {
     } catch (err) {
       console.error('Delete paper error', err);
       alert('Failed to delete paper');
+    } finally {
+      setDeleteSubmitting(false);
+      setDeleteModalOpen(false);
     }
   };
 
@@ -229,7 +232,7 @@ export const PyqViewer = () => {
 
           {user?.role === 'admin' && (
             <button
-              onClick={handleDeletePaperDirect}
+              onClick={() => setDeleteModalOpen(true)}
               className="h-11 px-4 bg-rose-600 hover:bg-rose-505 text-white rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all hover:scale-[1.01] active:scale-95 cursor-pointer shadow-md shadow-rose-600/10"
               title="Delete Paper"
             >
@@ -443,6 +446,63 @@ export const PyqViewer = () => {
                   </button>
                 </form>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !deleteSubmitting && setDeleteModalOpen(false)}></div>
+          
+          <div className="glass w-full max-w-md rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-850 shadow-2xl relative animate-scale-in">
+            <button
+              onClick={() => !deleteSubmitting && setDeleteModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 hover:bg-slate-105 dark:hover:bg-slate-850 rounded-xl text-slate-400"
+              disabled={deleteSubmitting}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/20 text-rose-500 flex items-center justify-center">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Are you sure you want to permanently delete this paper?</h3>
+                <div className="text-sm text-slate-500 dark:text-slate-450 mt-4 space-y-2">
+                  <p>This will remove:</p>
+                  <ul className="list-disc pl-5 space-y-1 font-medium">
+                    <li>The PDF from Cloudinary</li>
+                    <li>The QuestionPaper document</li>
+                    <li>All extracted Question documents</li>
+                    <li>All SavedPaper references</li>
+                  </ul>
+                  <p className="font-bold text-rose-500 mt-4">This action cannot be undone.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={deleteSubmitting}
+                  className="flex-1 h-11 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleteSubmitting}
+                  className="flex-1 h-11 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold flex items-center justify-center shadow transition-colors disabled:bg-rose-600/50 cursor-pointer"
+                >
+                  {deleteSubmitting ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <span>Delete Permanently</span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
         signup,
         login,
         logout,
-        isAdmin: user?.role === 'admin'
+        isAdmin: user?.role === 'admin' && user?.email?.toLowerCase() === 'admin@cuj.edu'
       }}
     >
       {children}

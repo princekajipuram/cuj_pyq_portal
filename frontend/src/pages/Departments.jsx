@@ -3,8 +3,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api.js';
 import { CardSkeleton, ListSkeleton } from '../components/common/Skeleton.jsx';
 import { GraduationCap, ArrowRight, Library, Search, BookOpen } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { useContext } from 'react';
 
 export const Departments = () => {
+  const { isAdmin } = useContext(AuthContext);
   const [departments, setDepartments] = useState([]);
   const [branches, setBranches] = useState({}); // Mapped by deptId
   const [loading, setLoading] = useState(true);
@@ -87,14 +90,16 @@ export const Departments = () => {
             <BookOpen className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No Papers Found</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-              We couldn't find any papers matching your search term. You can contribute by uploading one yourself!
+              {isAdmin ? "We couldn't find any papers matching your search term. You can contribute by uploading one yourself!" : "We couldn't find any papers matching your search term. Check back later when admins upload more papers."}
             </p>
-            <Link
-              to="/upload"
-              className="inline-flex items-center gap-2 px-6 h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-md"
-            >
-              Upload Paper
-            </Link>
+            {isAdmin && (
+              <Link
+                to="/upload"
+                className="inline-flex items-center gap-2 px-6 h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-md"
+              >
+                Upload Paper
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -38,7 +38,7 @@ router.get('/questions', getQuestions);
 router
   .route('/')
   .get(getPapers)
-  .post(protect, upload.single('file'), uploadPaper);
+  .post(protect, authorize('admin'), upload.single('file'), uploadPaper);
 
 router
   .route('/:id')

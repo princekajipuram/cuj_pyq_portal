@@ -7,10 +7,16 @@ export const authorize = (...roles) => {
       });
     }
 
-    if (!roles.includes(req.user.role)) {
+    // Strict override: Even if DB says admin, enforce email
+    let userRole = req.user.role;
+    if (userRole === 'admin' && req.user.email?.toLowerCase() !== 'admin@cuj.edu') {
+      userRole = 'user'; // Demote in-memory
+    }
+
+    if (!roles.includes(userRole)) {
       return res.status(403).json({
         success: false,
-        message: `User role '${req.user.role}' is not authorized to access this resource`
+        message: `User role '${userRole}' is not authorized to access this resource`
       });
     }
 

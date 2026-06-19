@@ -3,12 +3,15 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api.js';
 import { CardSkeleton, ListSkeleton } from '../components/common/Skeleton.jsx';
 import { FileText, Database, Calendar, Filter, Sparkles, Copy, Check } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { useContext } from 'react';
 
 export const SubjectDetails = () => {
   const { subjectId } = useParams();
   const [searchParams] = useSearchParams();
   const subjectName = searchParams.get('name') || 'Course Details';
   const subjectCode = searchParams.get('code') || 'CS-XXX';
+  const { isAdmin } = useContext(AuthContext);
 
   const [activeTab, setActiveTab] = useState('papers'); // 'papers' or 'questions'
   const [papers, setPapers] = useState([]);
@@ -138,14 +141,16 @@ export const SubjectDetails = () => {
               <FileText className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
               <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No Papers Uploaded</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-                Be the first to upload a question paper for this subject!
+                {isAdmin ? 'Be the first to upload a question paper for this subject!' : 'No papers have been uploaded by admins yet. Check back later!'}
               </p>
-              <Link
-                to="/upload"
-                className="inline-flex items-center gap-2 px-6 h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-md"
-              >
-                Upload Paper
-              </Link>
+              {isAdmin && (
+                <Link
+                  to="/upload"
+                  className="inline-flex items-center gap-2 px-6 h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold shadow-md"
+                >
+                  Upload Paper
+                </Link>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
