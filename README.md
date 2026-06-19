@@ -4,7 +4,7 @@ A comprehensive, production-grade academic resource platform built to digitize a
 
 This project tackles the difficult problem of unstructured, scattered academic resources by providing a centralized, highly searchable catalog powered by an automated AI-OCR engine that extracts text directly from scanned documents.
 
-[**Live Deployment**](https://cuj-pyq-portal.vercel.app/) *(Insert your live URL here if deployed)*
+https://project-wx9j1.vercel.app/
 
 ---
 
